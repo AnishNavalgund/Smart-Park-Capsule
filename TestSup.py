@@ -58,13 +58,13 @@ canvas1.create_window(1400, 380, window=entry6)
 
 led = tk_tools.Led(canvas1, size=100)
 # led.grid(row=5, column=0, sticky='news')
-led_canvas = canvas1.create_window(170,200,anchor="nw",window = led)
+led_canvas = canvas1.create_window(160,200,anchor="nw",window = led)
 #led.pack()
 led.to_grey()
 
 led1 = tk_tools.Led(canvas1, size=100)
 # led.grid(row=5, column=0, sticky='news')
-led_canvas = canvas1.create_window(770,200,anchor="nw",window = led1)
+led_canvas = canvas1.create_window(760,200,anchor="nw",window = led1)
 #led.pack()
 led1.to_grey()
 
@@ -74,15 +74,15 @@ led_canvas = canvas1.create_window(1250,200,anchor="nw",window = led2)
 #led.pack()
 led2.to_grey()
 
-canvas1.create_text( 400, 500, fill="Yellow",font="Andy 20 bold", text = "Parking Gate")
+canvas1.create_text( 400, 450, fill="Yellow",font="Andy 20 bold", text = "Parking Gate")
 
 led3 = tk_tools.Led(canvas1, size=100)
 # led.grid(row=5, column=0, sticky='news')
-led_canvas = canvas1.create_window(350,550,anchor="nw",window = led3)
+led_canvas = canvas1.create_window(350,500,anchor="nw",window = led3)
 #led.pack()
 led2.to_grey()
 
-canvas1.create_text( 1100, 500, fill="Yellow",font="Andy 20 bold", text = "Temperature Monitor")
+canvas1.create_text( 1100, 450, fill="Yellow",font="Andy 20 bold", text = "Temperature Monitor")
 
 def digitalclock():
    text_input = time.strftime("Time:%H:%M:%S")
