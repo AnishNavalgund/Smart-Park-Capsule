@@ -14,25 +14,31 @@ HostAddress = "192.168.0.222"
 SensorTopicName = "temperatureTopic"
 PlanTopicName = "temperatureAction"
 
-"""file = open("data.csv", "w")
-writer = csv.writer(file)
-writer.writerow(["Time", "Temperature", "Humidity", "Light", "Motion", "Ultrasonic"])
-"""
 
 #--------------Function Definitions------------------#
 #Function to extract the action from the recieved plan
 def parseFile(filename):
-    action={}
+    action_out={}
     f = open(filename, 'r')
     lines = f.readlines()[0:4]
      #to remove first character '('
     for i in range(0,4):
        # lines = lines[1:]
         line_split = lines[i].split()#split at spaces
-        action[i]=line_split[0]
+        
         #print(action[i])
     
-    return action
+        if '(decreasetemperature' in line_split[0] or '(increasetemperature' in line_split[0]:
+            action_out['temp_action'] = line_split[0]
+        elif '(opendoor' in line_split[0] or '(closedoor' in line_split[0]:
+            action_out['pir_action'] = line_split[0]
+        elif '(switchonlight' in line_split[0] or '(switchofflight' in line_split[0]:
+            action_out['light_action'] = line_split[0]
+        elif '(spotnotoccupied' in line_split[0] or '(spotoccupied' in line_split[0]:
+            action_out['ultra_action'] = line_split[0]
+        else:
+            print('error')
+    return action_out
 
 #Function to call the planner via command line statement by passing the planner.py Domain.pddl Problem.pddl plan.text
 def run_planner(domainname, problem, out):
@@ -66,17 +72,19 @@ def generate_problemfile(excel_data):
 (:init""")
     f.write("\n")
     if excel_data['temperature'] is not None:
-        if excel_data['temperature'] > 22:
+        if excel_data['temperature'] > 25:
             f.write("\t(TempHigh TempSensor)\n")
-        elif excel_data['temperature'] <= 22:
+        elif excel_data['temperature'] <= 25:
             f.write("\t(FanOn Fan)\n")
+        else:
+            f.write("\t(FanOn Fan)\n") #temp low
 
     if excel_data['Lightsensor'] >= 300.0 :
         f.write("\t(LuminosityHigh LightSensor)\n\t(LightOn Light)\n") #turn led off
     else:
         f.write("\n")
     
-    if excel_data['Motion_sensor'] == 1.0 :
+    if excel_data['IR_sensor'] == 1.0 :
         f.write("\t(Notmax Parkingvacancy)\n") #open door
     else: 
         f.write("\t(IRHigh IRSensor)\n\t(DoorOpen Door)\n")
@@ -93,13 +101,12 @@ def generate_problemfile(excel_data):
 )""")   
     f.close()
 
-
 def on_message(client, userdata, message):
     global writer
     s = str(message.payload.decode("utf-8"))
     print("Received msg is ", s)
     payload_data = ast.literal_eval(s)
-    excel_data = {'timeStamp': None, 'temperature': None, 'humidity': None, 'Lightsensor':None, 'Motion_sensor': None, 'Ultrasonic-2': None}
+    excel_data = {'timeStamp': None, 'temperature': None, 'humidity': None, 'Lightsensor':None, 'IR_sensor': None, 'Ultrasonic-2': None}
     if 'timeStamp' in payload_data and payload_data['timeStamp'] is not None:
         excel_data['timeStamp'] = payload_data['timeStamp']
     if 'temperature' in payload_data and payload_data['temperature'] is not None:
@@ -108,37 +115,27 @@ def on_message(client, userdata, message):
         excel_data['humidity'] = payload_data['humidity']
     if 'Lightsensor' in payload_data and payload_data['Lightsensor'] is not None:
         excel_data['Lightsensor'] = payload_data['Lightsensor']
-    if 'Motion_sensor' in payload_data and payload_data['Motion_sensor'] is not None:
-        excel_data['Motion_sensor'] = payload_data['Motion_sensor']
+    if 'IR_sensor' in payload_data and payload_data['IR_sensor'] is not None:
+        excel_data['IR_sensor'] = payload_data['IR_sensor']
     if 'Ultrasonic-2' in payload_data and payload_data['Ultrasonic-2'] is not None:
         excel_data['Ultrasonic-2'] = payload_data['Ultrasonic-2']
     
     #print("msg sent: temperature " + "%.1f" % temperature +"  humidity " + "%.1f" % humidity +" Ultrasonic-1 " + "%.1f" % us +" Ultrasonic-2 " + "%.1f" % us2 +" Lightsensor :" + "%.1f" % light  +" Motion_sensor:  " + "%.1f" % motion +" IR_sensor:  " + "%.1f" % ir   ) # Print sent temperature msg on console
    
     print(f"Excel data : {excel_data}")
-   # writer.writerow([excel_data['timeStamp'], excel_data['temperature'], excel_data['humidity'], excel_data['Lightsensor'],excel_data['Motion_sensor'], excel_data['Ultrasonic-2']])
+   
     
-    """TempAction = None
-    LightAction = None
-    GateAction = None
-    UltrasonicAction = None"""
     #---------select problem files according to the sensor data-------#
     domainname= 'Domainnew.pddl' #select domain file
     filename = 'temp.text'
     #----Generate Problem file------#
     generate_problemfile(excel_data)
     problem = 'testproblemfile.pddl'
-    problem = 'testproblemfile.pddl'
+    
     Action = run_planner(domainname, problem, filename)
     print(f"action : {Action}")  
-
-    action_out={}
-    action_out['temp_action'] = Action[1]
-    action_out['light_action'] = Action[0]
-    action_out['pir_action'] = Action[3]
-    action_out['ultra_action'] = Action[2]
-    print(action_out)
-    mqtt_payload = str(action_out)
+    #print(Action)
+    mqtt_payload = str(Action)
     print(mqtt_payload)
     publish.single(PlanTopicName, mqtt_payload, hostname="192.168.0.222")
     
