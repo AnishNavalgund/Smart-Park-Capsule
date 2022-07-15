@@ -1,8 +1,8 @@
 # Smart Park Capsule
 
-Smart Park Capsule is an IOT based parking management system in a public building. This system provides an easy and time efficient parking solution which saves the user’s time and energy.
+Smart Park Capsule is an IOT based parking management system which can be utilized in any public building. This system provides an easy and time efficient parking solution which saves the user’s time and energy.
 
-Project assignemnt as part of "Smart City and IOT" course at the University of Stuttgart
+This is project assignemnt as part of "Smart City and IOT" course at the University of Stuttgart
 
 Team Members:
               
