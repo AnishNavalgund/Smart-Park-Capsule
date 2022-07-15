@@ -1,0 +1,4 @@
+(switchonlight ultrasonicsensor lightsensor fan)
+(increasetemperature ultrasonicsensor tempsensor fan)
+(spotnotoccupied ultrasonicsensor ultrasonicsensor fan)
+(closedoor irsensor door door)
