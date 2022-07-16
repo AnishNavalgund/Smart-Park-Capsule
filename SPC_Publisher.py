@@ -1,3 +1,25 @@
+"""
+Project:    Smart Park Capsule
+
+Course:     Smart City and IOT
+Institute:  Service Computing Department, IAAS, University of Stuttgart
+
+---------------- Team Members -----------
+
+Sl.No   |           Names                   
+  1     |     Swathi Shridhar               
+  2     |     Badruddin Mukadam             
+  3     |     Suraj Sakpal                  
+  4     |     Anish Krishna Navalgund       
+-----------------------------------------
+
+File Description: SPC_Publisher.py is the main code present on the RaspberryPi. This code publishes 
+                  Raspberry Pi sensor data through MQTT protocol to AWS. 
+
+Timestamp: 10th July 2022
+
+"""
+
 import threading
 import paho.mqtt.client as paho
 import ssl
