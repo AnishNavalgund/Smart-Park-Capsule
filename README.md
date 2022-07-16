@@ -13,6 +13,8 @@ Team Members:
 
 **Project Files:**
 
+**SPC_Publisher.py** - This is the main code present on the RaspberryPi. This code publishes Raspberry Pi sensor data through MQTT protocol to AWS. 
+                  
 **SPC_Subcriber.py** - This is the main code to run in the project. This code connects to the Raspberry Pi through MQTT protocol and subscibes to the sensor data. This code also runs the AI-planner as and when the sensor data is subscribed. 
 
 **SPC_AIPlanner.py** - This is the main code to perform AI-Planning. The code will generate the plan dynamically as the per the input sensor data.
