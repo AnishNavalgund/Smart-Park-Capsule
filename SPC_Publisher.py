@@ -19,7 +19,6 @@ File Description: SPC_Publisher.py is the main code present on the RaspberryPi. 
 Timestamp: 10th July 2022
 
 """
-
 import threading
 import paho.mqtt.client as paho
 import ssl
@@ -49,11 +48,11 @@ TempTimeout = 1
 LightSensor = 0
 
 # Connect the Grove LED to digital port D3
-led = 3
+led = 4
 pinMode(led,"OUTPUT")
 
 # Connect the Grove LED to digital port D5 for resemblence of Led strip
-led_strip = 5
+led_strip = 3
 pinMode(led_strip,"OUTPUT")
 
 # Connect the Grove Buzzer to digital port D2
@@ -161,21 +160,16 @@ def cooler_actuation(temp_output):
             fanon()
             
 def light_actuation(light_output):
-    #LED_PIN = 18#################################
-    #GPIO.setup(LED_PIN, GPIO.OUT)
     if light_output is not None:
         if light_output == '(switchonlight':
             print("LIGHTS: ON")
             digitalWrite(led_strip,1)  
-            #GPIO.output(LED_PIN, True)
         else:
             print("LIGHTS: OFF")
             digitalWrite(led_strip,0)	
-           # GPIO.output(LED_PIN, False)
 def gate_actuation(pir_output,ultra_output):
     if pir_output is not None:
         servo.start(0)
-        #print(pir_output)
         if pir_output == '(opendoor' and ultra_output == '(spotoccupied':
             setText("Parking spots \n full! SORRY:(")
             setRGB(0,0,64)
@@ -192,7 +186,6 @@ def gate_actuation(pir_output,ultra_output):
         elif pir_output == '(opendoor' and ultra_output != '(spotoccupied':
             print ("Opening the door !")
             setText(" Welcome!Free spots available.")
-            #print ("Opening the main door !") 
             servo.ChangeDutyCycle(7)
             time.sleep(0.5)
             servo.ChangeDutyCycle(0)
@@ -208,23 +201,16 @@ def gate_actuation(pir_output,ultra_output):
             
         else:
             print("Door is close")
-            #setText("Parking spots \n full!")
-            #setRGB(0,10,64)
 
 def ultra_actuation(ultra_output):
     if ultra_output is not None:
         if ultra_output == '(spotoccupied':
             print("occupied: led off")
             digitalWrite(led,0)
-            #count_flag=1
-            #notmax=0
-            #GPIO.output(LED_PIN, True)
         else:
             print("Not occupied: led on")
             digitalWrite(led,1)        # Send HIGH to switch on LED
-            #print ("LED ON!")
-            #notmax=1
-            
+           
 mqttc = paho.Client()
 client= paho.Client()
 
@@ -284,16 +270,16 @@ def sensordatapublish():
         
 
 awshost = "a2ngemuw19bbnm-ats.iot.eu-central-1.amazonaws.com"      # Endpoint
-awsport = 8883                                              # Port no.   
-clientId = "myLaptop"                                     # Thing_Name
-thingName = "Raspberrypi"                                    # Thing_Name
-caPath = "/home/pi/Public/AWS_IOT/AmazonRootCA1.pem" #Amazon's certificate from Third party                                     # Root_CA_Certificate_Name
-certPath = "/home/pi/Public/AWS_IOT/certificate.pem.crt"   # <Thing_Name>.cert.pem.crt. Thing's certificate from Amazon
-keyPath = "/home/pi/Public/AWS_IOT/private.pem.key"        # <Thing_Name>.private.key Thing's private key from Amazon
+awsport = 8883                                                     # Port no.   
+clientId = "myLaptop"                                              # Thing_Name
+thingName = "Raspberrypi"                                          # Thing_Name
+caPath = "/home/pi/Public/AWS_IOT/AmazonRootCA1.pem"               #Amazon's certificate from Third party                                     # Root_CA_Certificate_Name
+certPath = "/home/pi/Public/AWS_IOT/certificate.pem.crt"           # <Thing_Name>.cert.pem.crt. Thing's certificate from Amazon
+keyPath = "/home/pi/Public/AWS_IOT/private.pem.key"                # <Thing_Name>.private.key Thing's private key from Amazon
  
 mqttc.tls_set(caPath, certfile=certPath, keyfile=keyPath, cert_reqs=ssl.CERT_REQUIRED, tls_version=ssl.PROTOCOL_TLSv1_2, ciphers=None)  # pass parameters
-mqttc.connect(awshost, awsport, keepalive=60)               # connect to aws server
-mqttc.loop_start()                                          # Start the loop
+mqttc.connect(awshost, awsport, keepalive=60)                      # connect to aws server
+mqttc.loop_start()                                                 # Start the loop
 
 #---------Start threads to publish sensor data and recieve the plan ---------#
 t1 = threading.Thread(target=sensordatapublish)
