@@ -22,8 +22,14 @@ Timestamp: 10th July 2022
 # Import required python packages 
 import os
 import time
+import datetime as dt
 from tkinter import DISABLED
 from SPC_GUI import led_pg, led_spot2, cv, entry2, exit2
+from   tkinter import *
+import tkinter as tk
+import tk_tools
+from   tkinter.font import BOLD
+import paho.mqtt.client as paho
 
 # Function to extract the action from the recieved plan
 def parseFile(filename):
@@ -113,24 +119,13 @@ def generate_problemfile(excel_data):
     if excel_data['Ultrasonic-2'] <= 11.0 :
         f.write("\t(LedOn Led)\n") #off#car present
         led_spot2.to_red()
-        flag_high = 1
+        timenow_2out =  time.strftime("%H:%M:%S") 
+        entry2.insert(0,timenow_2out)
+        entry2.config(state=DISABLED)
+        cv.create_window(730, 380, window=entry2)
     else:
         f.write("\t(UltrasonicHigh UltrasonicSensor)\n")
         led_spot2.to_green()
-
-        if((flag == 1)):
-            timenow_2out =  time.strftime("%H:%M:%S") 
-            exit2.insert(0,timenow_2out)
-            exit2.config(state=DISABLED)
-            cv.create_window(150, 380, window=exit2)
-            flag = 0
-
-    if((flag_high == 1)):
-        timenow_2 =  time.strftime("%H:%M:%S") 
-        entry2.insert(0,timenow_2)
-        entry2.config(state=DISABLED)
-        cv.create_window(150, 380, window=entry2)
-        flag_high = 0
 
     f.write(""")
 
