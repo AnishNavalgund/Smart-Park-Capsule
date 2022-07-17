@@ -22,6 +22,7 @@ Timestamp: 10th July 2022
 """
 
 # Import required python packages 
+import csv
 import paho.mqtt.client as paho
 import paho.mqtt.publish as publish
 import ast
@@ -33,6 +34,12 @@ from   SPC_AIPlanner import run_planner, generate_problemfile
 HostAddress     = "192.168.0.222"          #Connect to RaspberryPi IP
 SensorTopicName = "temperatureTopic"   #Subscribe to topic
 PlanTopicName   = "temperatureAction"
+
+#
+#file = open("iotdata.csv", "w")
+with open("iotdata.csv", 'w') as file: 
+    writer = csv.writer(file)
+    writer.writerow(["Time", "Temperature", "Humidity", "Luminosity", "Gate", "Occupancy"])
 
 # Extract the sensor data 
 def on_message(client, userdata, message):
@@ -77,7 +84,14 @@ def on_message(client, userdata, message):
         extract_sensor_data['Ultrasonic-2'] = message_data['Ultrasonic-2']
    
     print(f"Subcribed Sensor Data : {extract_sensor_data}")
-    
+    #with open("iotdata.csv", 'w') as csvfile:
+    with open("iotdata.csv", 'a') as file:  
+        writer = csv.writer(file)
+        writer.writerow([extract_sensor_data['timeStamp'], extract_sensor_data['temperature'], extract_sensor_data['humidity'], extract_sensor_data['Lightsensor'],
+                     extract_sensor_data['IR_sensor'], extract_sensor_data['Ultrasonic-2']])
+
+# Variables for actuation 
+
     # AI Planning Actions
     domainname= 'SPC_DomainFile.pddl'   # Select domain file
     filename = 'SPC_GeneratedPlan.text' # Select the text file to which plan has to be written
@@ -88,7 +102,7 @@ def on_message(client, userdata, message):
     Action = run_planner(domainname, problem, filename) #Run AI Planner
     print(f"action : {Action}")  
     mqtt_msg = str(Action) 
-    print(mqtt_msg)
+    print(f"sent message : {mqtt_msg}")
     publish.single(PlanTopicName, mqtt_msg, hostname="192.168.0.222")
 
 #Subscibe to client when on_connect() is called    
