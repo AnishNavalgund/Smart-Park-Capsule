@@ -20,10 +20,12 @@ Timestamp: 10th July 2022
 
 """
 # Import required python packages 
+from ast import Global
 import os
 import time
 import datetime as dt
 from tkinter import DISABLED
+from unittest import result
 from SPC_GUI import led_pg, led_spot2, cv, entry2, exit2
 from   tkinter import *
 import tkinter as tk
@@ -31,6 +33,7 @@ import tk_tools
 from   tkinter.font import BOLD
 import paho.mqtt.client as paho
 
+flag_US = False
 # Function to extract the action from the recieved plan
 def parseFile(filename):
 
@@ -69,6 +72,7 @@ def run_planner(domainname, problem, out):
     return action
 
 def generate_problemfile(excel_data):
+    global flag_US
     f = open("SPC_ProblemFile.pddl", "w")
     f.write("""(define (problem SPCProblem) (:domain SPCDomain)
 
@@ -103,7 +107,7 @@ def generate_problemfile(excel_data):
         print('temp= nan')
 
     if excel_data['Lightsensor'] <  200 :
-        f.write("\n")
+        f.write("\t(LuminosityLow LightSensor)\n")
         print("In Light IF")
     else:        
         f.write("\t(LuminosityHigh LightSensor)\n\t(LightOn Light)\n") #turn led off
@@ -116,16 +120,27 @@ def generate_problemfile(excel_data):
         f.write("\t(IRHigh IRSensor)\n\t(DoorOpen Door)\n")
         led_pg.to_red()
 
+   
+
     if excel_data['Ultrasonic-2'] <= 11.0 :
         f.write("\t(LedOn Led)\n") #off#car present
         led_spot2.to_red()
-        timenow_2out =  time.strftime("%H:%M:%S") 
-        entry2.insert(0,timenow_2out)
+        timenow_2in =  time.strftime("%H:%M:%S") 
+        entry2.insert(0,timenow_2in)
         entry2.config(state=DISABLED)
         cv.create_window(730, 380, window=entry2)
+        flag_US = True
+       
     else:
         f.write("\t(UltrasonicHigh UltrasonicSensor)\n")
         led_spot2.to_green()
+        
+        if flag_US is True:
+            timenow_2out =  time.strftime("%H:%M:%S") 
+            exit2.insert(0,timenow_2out)
+            exit2.config(state=DISABLED)
+            cv.create_window(880, 380, window=exit2)
+        flag_US = False
 
     f.write(""")
 
