@@ -73,16 +73,10 @@ cv.create_window(300, 380, window=exit1)
 # Add widgets to record In-Time of vehicles for Parking Spot 2
 cv.create_text( 730, 360, fill="Cyan",font="Andy 13 bold", text = "In-Time")
 entry2 = tk.Entry (root, justify = CENTER, font=("Times", 10, BOLD))
-"""timenow_2out =  time.strftime("%H:%M:%S") 
-entry2.insert(0,timenow_2out)
-entry2.config(state=DISABLED)
-cv.create_window(730, 380, window=entry2)"""
 
 # Add widgets to record Out-Time of vehicles for Parking Spot 2
 cv.create_text( 880, 360, fill="Cyan",font="Andy 13 bold", text = "Out-Time")
 exit2 = tk.Entry (root, justify = CENTER, font=("Times", 10, BOLD))
-exit2.config(state=DISABLED)
-cv.create_window(880, 380, window=exit2)
 
 # Add widgets to record In-Time of vehicles for Parking Spot 3
 cv.create_text( 1250, 360, fill="Cyan",font="Andy 13 bold", text = "In-Time")
