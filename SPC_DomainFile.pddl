@@ -23,7 +23,7 @@
 
         ;;Light Sensor to Maintain luminosity
         (LuminosityHigh ?lh - sensor) 
-        ;(LuminosityLow ?ll - sensor)
+        (LuminosityLow ?ll - sensor)
         (LuminositySuitable ?ls - sensor)
         (LightOn ?lo - actuator)
         ;(LightOff ?loff - actuator)
@@ -57,7 +57,7 @@
 
     (:action SwitchOnLight
         :parameters (?lumi ?lsuit -sensor ?led -actuator)
-        :precondition (and (not(LuminosityHigh ?lumi)) (not(LightOn ?led)) (not(LuminositySuitable ?lsuit)))
+        :precondition (and (LuminosityLow ?lumi) (not(LightOn ?led)) (not(LuminositySuitable ?lsuit)))
         :effect (and (LightOn ?led) (LuminositySuitable ?lsuit))
     )
     (:action SwitchOffLight
